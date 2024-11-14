@@ -27,3 +27,47 @@ export const validateMyUserRequest = [
 
   handleValidationErrors,
 ];
+
+export const validateMyRestaurantRequest = [
+  body("restaurantName").notEmpty().withMessage("Restaurant name is required"),
+  body("city").notEmpty().withMessage("City is required"),
+  body("country").notEmpty().withMessage("Country is required"),
+  body("deliveryPrice")
+    .isFloat({ min: 0 })
+    .withMessage("Delivery price must be a positive number"),
+  body("estimatedDeliveryTime")
+    .isInt({ min: 0 })
+    .withMessage("Estimated delivery time must be a positive integer"),
+  body("estimatedDeliveryTime")
+    .isInt({ min: 0 })
+    .withMessage("Estimated delivery time must be a positive integer"),
+  body("cuisines")
+    .isArray()
+    .withMessage("Cuisines must be an array")
+    .not()
+    .isEmpty()
+    .withMessage("Cuisines array cannot be empty"),
+  body("menuItems").isArray().withMessage("Menu items must be an array"),
+  body("menuItems.*.name").notEmpty().withMessage("Menu item name is required"),
+  body("menuItems.*.price")
+    .isFloat({ min: 0 })
+    .withMessage("Menu item price is required and must be a positive number"),
+  handleValidationErrors,
+];
+
+export const validateMyProductRequest = [
+  body("name").notEmpty().withMessage("Restaurant name is required"),
+  body("price")
+    .isFloat({ min: 0 })
+    .withMessage("Menu item price is required and must be a positive number"),
+  body("material").notEmpty().withMessage("Country is required"),
+  body("stone").notEmpty().withMessage("Country is required"),
+  body("status").notEmpty().withMessage("Country is required"),
+  body("style")
+    .isArray()
+    .withMessage("Cuisines must be an array")
+    .not()
+    .isEmpty()
+    .withMessage("Cuisines array cannot be empty"),
+  handleValidationErrors,
+];
