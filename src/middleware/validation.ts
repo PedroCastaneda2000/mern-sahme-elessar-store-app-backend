@@ -56,18 +56,19 @@ export const validateMyRestaurantRequest = [
 ];
 
 export const validateMyProductRequest = [
-  body("name").notEmpty().withMessage("Restaurant name is required"),
+  body("name").notEmpty().withMessage("Product name is required"),
   body("price")
     .isFloat({ min: 0 })
-    .withMessage("Menu item price is required and must be a positive number"),
-  body("material").notEmpty().withMessage("Country is required"),
-  body("stone").notEmpty().withMessage("Country is required"),
-  body("status").notEmpty().withMessage("Country is required"),
-  body("style")
-    .isArray()
-    .withMessage("Cuisines must be an array")
-    .not()
-    .isEmpty()
-    .withMessage("Cuisines array cannot be empty"),
+    .withMessage("Price is required and must be a positive number"),
+  body("category").notEmpty().withMessage("Category is required"),
+  body("material").notEmpty().withMessage("Material is required"),
+  body("stone").notEmpty().withMessage("Stone is required"),
+  body("status").notEmpty().withMessage("Status is required"),
+  // body("stones")
+  //   .isArray()
+  //   .withMessage("Cuisines must be an array")
+  //   .not()
+  //   .isEmpty()
+  //   .withMessage("Cuisines array cannot be empty"),
   handleValidationErrors,
 ];

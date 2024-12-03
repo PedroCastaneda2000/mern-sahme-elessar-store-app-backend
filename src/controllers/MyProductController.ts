@@ -63,10 +63,11 @@ const updateMyProduct = async (req: Request, res: Response) => {
 
     product.name = req.body.name;
     product.price = req.body.price;
+    product.category = req.body.category;
     product.material = req.body.material;
     product.stone = req.body.stone;
     product.status = req.body.status;
-    product.style = req.body.style;
+    // product.stones = req.body.stones;
     product.lastUpdated = new Date();
 
     if (req.file) {
