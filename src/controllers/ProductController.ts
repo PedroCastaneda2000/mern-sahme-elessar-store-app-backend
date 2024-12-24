@@ -1,6 +1,24 @@
 import { Request, Response } from "express";
 import Product from "../models/product";
 
+const getProduct = async (req: Request, res: Response) => {
+  try {
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      res.status(404).json({ message: "product not found" });
+      return;
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 const searchProducts = async (req: Request, res: Response) => {
   try {
     const category = req.params.category;
@@ -146,4 +164,5 @@ const getProducts = async (req: Request, res: Response) => {
 export default {
   searchProducts,
   getProducts,
+  getProduct,
 };

@@ -8,7 +8,9 @@ import mongoose from "mongoose";
 
 const getMyProduct = async (req: Request, res: Response) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
 
     if (!product) {
       res.status(404).json({ message: "Product not found!" });
@@ -54,7 +56,9 @@ const createMyProduct = async (req: Request, res: Response) => {
 
 const updateMyProduct = async (req: Request, res: Response) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
 
     if (!product) {
       res.status(404).json({ message: "Product not found!" });
@@ -67,7 +71,6 @@ const updateMyProduct = async (req: Request, res: Response) => {
     product.material = req.body.material;
     product.stone = req.body.stone;
     product.status = req.body.status;
-    // product.stones = req.body.stones;
     product.lastUpdated = new Date();
 
     if (req.file) {
