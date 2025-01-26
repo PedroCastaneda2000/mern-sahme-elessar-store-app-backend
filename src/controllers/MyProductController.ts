@@ -23,13 +23,6 @@ const getMyProduct = async (req: Request, res: Response) => {
 
 const createMyProduct = async (req: Request, res: Response) => {
   try {
-    // const user = await User.findById(req.userId);
-    // if (!user || user.email !== ADMIN_EMAIL) {
-    //   return res
-    //     .status(403)
-    //     .json({ message: "Unauthorized! Incorrect email." });
-    // }
-
     const existingProduct = await Product.findOne({ name: req.body.name });
 
     if (existingProduct) {
