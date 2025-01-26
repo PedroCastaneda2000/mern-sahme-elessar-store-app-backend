@@ -13,6 +13,21 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, //5mb
   },
 });
+
+router.get(
+  "/order",
+  jwtCheck,
+  jwtParse,
+  MyProductController.getMyProductOrders
+);
+
+router.patch(
+  "/order/:orderId/status",
+  jwtCheck,
+  jwtParse,
+  MyProductController.updateOrderStatus
+);
+
 router.get("/:productId", jwtCheck, jwtParse, MyProductController.getMyProduct);
 
 router.post(
@@ -31,6 +46,13 @@ router.put(
   jwtCheck,
   jwtParse,
   MyProductController.updateMyProduct
+);
+
+router.delete(
+  "/:productId",
+  jwtCheck,
+  jwtParse,
+  MyProductController.deleteMyProduct
 );
 
 export default router;

@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { Request, Response } from "express";
 import Product, { ProductType } from "../models/product";
 import Order from "../models/order";
-import { AnyAaaaRecord } from "dns";
+import User from "../models/user";
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 
@@ -10,11 +10,40 @@ const FRONTEND_URL = process.env.FRONTEND_URL as string;
 
 const STRIPE_ENDPOINT_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
 
+const ADMIN_USER = process.env.AUTH0_ADMIN_USER;
+
+const getMyOrders = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOne({ auth0Id: req.auth0Id });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (user.email.toLowerCase() === ADMIN_USER) {
+      const orders = await Order.find().populate("user");
+      res.json(orders);
+      return;
+    }
+
+    const orders = await Order.find({ user: req.userId }).populate("user");
+
+    res.json(orders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 type CheckoutSessionRequest = {
   cartItems: {
     productId: string;
     name: string;
     quantity: string;
+    imageUrl: string;
+    material: string;
+    stone: string;
   }[];
   deliveryDetails: {
     email: string;
@@ -31,7 +60,7 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
     event = STRIPE.webhooks.constructEvent(
       req.body,
       sig as string,
-      STRIPE_ENDPOINT_SECRET
+      STRIPE_ENDPOINT_SECRET,
     );
   } catch (error: any) {
     console.log(error);
@@ -75,7 +104,14 @@ const createCheckoutSession = async (req: Request, res: Response) => {
       user: req.userId,
       status: "placed",
       deliveryDetails: checkoutSessionRequest.deliveryDetails,
-      cartItems: checkoutSessionRequest.cartItems,
+      cartItems: checkoutSessionRequest.cartItems.map((item) => ({
+        productId: item.productId,
+        name: item.name,
+        quantity: parseInt(item.quantity),
+        imageUrl: item.imageUrl,
+        material: item.material,
+        stone: item.stone,
+      })),
       createdAt: new Date(),
     });
 
@@ -86,7 +122,7 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     const session = await createSession(
       lineItems,
       newOrder._id.toString(),
-      deliveryPrice
+      deliveryPrice,
     );
 
     if (!session.url) {
@@ -104,11 +140,11 @@ const createCheckoutSession = async (req: Request, res: Response) => {
 
 const createLineItems = (
   checkoutSessionRequest: CheckoutSessionRequest,
-  products: ProductType[]
+  products: ProductType[],
 ) => {
   const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
     const product = products.find(
-      (product) => product._id.toString() === cartItem.productId.toString()
+      (product) => product._id.toString() === cartItem.productId.toString(),
     );
 
     if (!product) {
@@ -122,6 +158,10 @@ const createLineItems = (
         product_data: {
           name: product.name,
           images: [product.imageUrl],
+          metadata: {
+            material: product.material,
+            stone: product.stone,
+          },
         },
       },
       quantity: parseInt(cartItem.quantity),
@@ -136,7 +176,7 @@ const createLineItems = (
 const createSession = async (
   lineItems: Stripe.Checkout.SessionCreateParams.LineItem[],
   orderId: string,
-  deliveryPrice: number
+  deliveryPrice: number,
 ) => {
   const sessionData = await STRIPE.checkout.sessions.create({
     line_items: lineItems,
@@ -165,6 +205,7 @@ const createSession = async (
 };
 
 export default {
+  getMyOrders,
   createCheckoutSession,
   stripeWebhookHandler,
 };

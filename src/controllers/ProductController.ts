@@ -32,7 +32,10 @@ const searchProducts = async (req: Request, res: Response) => {
 
     let query: any = {};
 
-    query["category"] = new RegExp(category, "i");
+    query["category"] =
+      category === "earrings" || category === "rings"
+        ? category
+        : new RegExp(category, "i");
     const categoryCheck = await Product.countDocuments(query);
     if (categoryCheck === 0) {
       res.status(404).json([
@@ -68,11 +71,11 @@ const searchProducts = async (req: Request, res: Response) => {
       query["status"] = new RegExp(status, "i");
     }
 
-    const pageSize = 10;
+    const pageSize = 12;
     const skip = (page - 1) * pageSize;
 
     const products = await Product.find(query)
-      .sort({ [sortOption]: 1 })
+      .sort({ [sortOption]: sortOption === "lastUpdated" ? -1 : 1 })
       .skip(skip)
       .limit(pageSize)
       .lean();
@@ -131,7 +134,10 @@ const getProducts = async (req: Request, res: Response) => {
     }
 
     if (category) {
-      query["category"] = new RegExp(category, "i");
+      query["category"] =
+        category === "earrings" || category === "rings"
+          ? category
+          : new RegExp(category, "i");
     }
 
     const pageSize = 12;

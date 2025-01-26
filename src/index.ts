@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
 import mongoose from "mongoose";
-import myRestaurantRoute from "./routes/MyRestaurantRoute";
+
 import { v2 as cloudinary } from "cloudinary";
 import myUserRoute from "./routes/MyUserRoute";
 import myProductRoute from "./routes/MyProductRoute";
@@ -31,8 +31,6 @@ app.get("/health", async (req: Request, res: Response) => {
   res.send({ message: "Health OK!" });
 });
 
-app.use("/api/my/restaurant", myRestaurantRoute);
-// url: /api/my/user/
 app.use("/api/my/user", myUserRoute);
 // url: /api/my/product/ || productId
 app.use("/api/my/product", myProductRoute);
